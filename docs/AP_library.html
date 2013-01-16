@@ -1,0 +1,713 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html">
+<title>Documentation for AP_library</title>
+</head>
+<body>
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html">
+<h1>Documentation for AP_library</h1>
+<p>List of components in this package:<br>
+<a href="#ErrorCapsule">module ErrorCapsule</a><br>
+<a href="#Hashtable">module Hashtable</a><br>
+<a href="#AP_quicksort">module AP_quicksort</a><br>
+<a href="#AP_utils">module AP_utils</a><br>
+<a href="#InputParser">module InputParser</a><br>
+<a name="ErrorCapsule"></a>
+<h2>Module ErrorCapsule</h2>
+<p><pre>Module for unified error messaging
+-
+Fortran 90/95 lacks proper error handling.
+This module tries to overcome with that problem.
+Clients (program modules) that use this module can
+register itselves with unique error id, and then
+issue errors using that id. Upper-level program blocks
+can check the error status and choose wether to stop
+or continue, and where to print the error message.
+-
+Error messages include the id of the issuer, integer
+error code and a string message.
+-
+If you use this code in a publication, please make a reference to:
+A. Penttila", Fortran 95 error handling implementation (computer code),
+http://wiki.helsinki.fi/display/~aipentti@helsinki.fi/Collection+of+codes (2012).
+-
+Antti Penttila"
+2012
+Department of Physics, University of Helsinki</pre>
+<h3>Variables</h3>
+<table>
+<tr><td colspan=2>INTEGER, PARAMETER :: max_clients = 100</td></tr>
+<tr><td><pre>  </pre></td><td><pre>Private, maximum number of clients</pre><hr></td></tr>
+<tr><td colspan=2>INTEGER, PARAMETER :: max_msg_length = 512</td></tr>
+<tr><td><pre>  </pre></td><td><pre>Public, maximum message length</pre><hr></td></tr>
+</table>
+<h3>Functions</h3>
+<table>
+<tr><td colspan=3>get_err_id(name) RESULT(id)</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2><pre>Client must get a client_id first.</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>Variables inside</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>CHARACTER(LEN=*), INTENT(IN) :: name</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Input, name of the calling program unit/module</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>INTEGER :: id</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Result, unique id number for the client</pre><hr></td></tr>
+</table>
+<h3>Subroutines</h3>
+<table>
+<tr><td colspan=3>issue_error(id, code, msg)</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2><pre>Issue an error using client id</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>Variables inside</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>INTEGER, INTENT(IN) :: id, code</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Inputs, client id and integer error code.</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>CHARACTER(LEN=*), INTENT(IN) :: msg</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Input, string error message for the user.</pre><hr></td></tr>
+<tr><td colspan=3>clear_errors()</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2><pre>Clear errors, use when the possible errors
+have been handled somehow.</pre><hr></td></tr>
+<tr><td colspan=3>get_error(id, code, msg)</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2><pre>Get (last) error from specific client id</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>Variables inside</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>INTEGER, INTENT(IN) :: id</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Input, client id</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>INTEGER, INTENT(INOUT) :: code</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Output, error code</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>CHARACTER(LEN=max_msg_length), INTENT(INOUT) :: msg</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Output, error message</pre><hr></td></tr>
+<tr><td colspan=3>print_last_error(ch_id)</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2><pre>Prints last error. Can print to
+std_out or an open file channel</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>Variables inside</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>INTEGER, INTENT(IN) :: ch_id</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Input, use 0 to print to std_out, and
+positive integer to print to that unit.
+Be sure that the unit is open for writing.</pre><hr></td></tr>
+<tr><td colspan=3>print_errors(ch_id)</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2><pre>Prints all active errors, i.e. errors
+that have not been cleared. Prints to
+std_out or an open file channel</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>Variables inside</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>INTEGER, INTENT(IN) :: ch_id</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Input, use 0 to print to std_out, and
+positive integer to print to that unit.
+Be sure that the unit is open for writing.</pre><hr></td></tr>
+<tr><td colspan=3>check_errors(END_EXEC, CHANNEL)</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2><pre>Check and possibly print out error(s).
+Optionally can stop the execution of the program if
+there have been errors (default). Can print errors to
+std_out (default) or to an open file channel.</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>Variables inside</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>LOGICAL, OPTIONAL :: END_EXEC</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Optional input. If .TRUE. (default), will stop the execution
+of the whole program if errors are found.</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>INTEGER, INTENT(IN), OPTIONAL :: CHANNEL</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Optional nput, use 0 to print to std_out, and
+positive integer to print to that unit.
+Be sure that the unit is open for writing.</pre><hr></td></tr>
+</table>
+<a name="Hashtable"></a>
+<h2>Module Hashtable</h2>
+<p><pre>Provides hashtable in Fortran 90/95
+Can store, modify and read values from
+key/value pairs, where key is a string, and
+value can have different datatypes.
+-
+Antti Penttila"
+2012
+Department of Physics, University of Helsinki</pre>
+<h3>Modules needed</h3>
+<table>
+<tr><td colspan=2>USE Type_Kinds</td></tr>
+<tr><td><pre>  </pre></td><td><pre>types</pre><hr></td></tr>
+<tr><td colspan=2>USE String_Utility</td></tr>
+<tr><td><pre>  </pre></td><td><pre>string operations</pre><hr></td></tr>
+<tr><td colspan=2>USE ErrorCapsule</td></tr>
+<tr><td><pre>  </pre></td><td><pre>my own error package</pre><hr></td></tr>
+</table>
+<h3>Variables</h3>
+<table>
+<tr><td colspan=2>INTEGER, PARAMETER :: hash_key_length = 128</td></tr>
+<tr><td><pre>  </pre></td><td><pre>max hash key length</pre><hr></td></tr>
+<tr><td colspan=2>INTEGER, PARAMETER :: max_string_length = 1024</td></tr>
+<tr><td><pre>  </pre></td><td><pre>max length for string value</pre><hr></td></tr>
+<tr><td colspan=2>INTEGER, PARAMETER :: type_int = 1, type_real = 2, type_char = 3, type_logical = 4, type_string = 5, type_file_et_line = 6</td></tr>
+<tr><td><pre>  </pre></td><td><pre>type codes for hash node value</pre><hr></td></tr>
+<tr><td colspan=2>INTEGER, PARAMETER :: error_not_exists = -111, error_wrong_type = -112, error_allocation = -113,error_use_bef_allocation = -114, error_string_too_long = -115, error_string_length_mismatch = -116,stat_empty = 1</td></tr>
+<tr><td><pre>  </pre></td><td><pre>error codes</pre><hr></td></tr>
+</table>
+<h3>Interfaces</h3>
+<table>
+<tr><td colspan=2>add_hash_value</td></tr>
+<tr><td><pre>  </pre></td><td><pre>Adds new key-value pairs to hashtable. Supports various data types.
+Always results status value of the operation, 0 if success
+Call interface with
+  add_hash_value(key, value_data, do_empty) RESULT(stat)
+where
+  key  --  key of the hash value, string, max. length given in hash_key_length
+  value_data -- integer, real(fp_kind), character or logical
+  do_empty -- optional, but if given will create empty valued node
+or with
+  add_hash_value(key, value_data, str_len, do_empty) RESULT(stat)
+where
+  value_data is string and str_len is its length
+or with
+  add_hash_value(key, value_data, value_data2, str_len, do_empty) RESULT(stat)
+where
+ value_data is integer, value_data2 is string and str_len is its length.</pre><hr></td></tr>
+<tr><td colspan=2>get_hash_value</td></tr>
+<tr><td><pre>  </pre></td><td><pre>Gets the value of key-value pair from hashtable. Supports various data types.
+Always results status value of the operation, 0 if success and stat_empty if empty node
+Call interface with
+  get_hash_value(key, value_data) RESULT(stat)
+where
+  key  --  key of the hash value, string, max. length given in hash_key_length
+  value_data -- integer, real(fp_kind), character or logical
+or with
+  get_hash_value(key, value_data, str_len) RESULT(stat)
+where
+  value_data is string and str_len will be its length
+or with
+  get_hash_value(key, value_data, value_data2, str_len) RESULT(stat)
+where
+ value_data is integer, value_data2 is string and str_len is its length.</pre><hr></td></tr>
+<tr><td colspan=2>change_hash_value</td></tr>
+<tr><td><pre>  </pre></td><td><pre>Change the value of existing key-value pair in hashtable. Supports various data types.
+Always results status value of the operation, 0 if succes. If same_type is .TRUE. and the value data is not of the same
+type as the previous value, error error_wrong_type will be given to stat.
+Call interface with
+  change_hash_value(key, value_data, same_type) RESULT(stat)
+where
+  key  --  key of the hash value, string, max. length given in hash_key_length
+  value_data -- integer, real(fp_kind), character or logical
+or with
+  change_hash_value(key, value_data, str_len, same_type) RESULT(stat)
+where
+  value_data is string and str_len will be its length
+or with
+  change_hash_value(key, value_data, value_data2, str_len) RESULT(stat)
+where
+ value_data is integer, value_data2 is string and str_len is its length.</pre><hr></td></tr>
+</table>
+<h3>Functions</h3>
+<table>
+<tr><td colspan=3>delete_hash_node(key) RESULT(stat)</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2><pre>Deletes (and deallocates) the node with a
+give key</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>Variables inside</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>CHARACTER(LEN=*), INTENT(IN) :: key</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>key-value of the pair, input</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>INTEGER :: stat</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>result, status of operation</pre><hr></td></tr>
+<tr><td colspan=3>hash_value_type(key, is_empty) RESULT(stat)</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2><pre>Gives the type of the hash value with a given key.
+Type codes are integers and are public variables in this
+module. Optional argument can be given to check
+if the hash value exists, but has empty value.
+Will result 0 hashvalue with key does not exist.</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>Variables inside</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>CHARACTER(LEN=*), INTENT(IN) :: key</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Key of the hashvalue</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>LOGICAL, INTENT(OUT), OPTIONAL :: is_empty</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>If given, will be .TRUE. on exit if the key exists
+but the value is empty</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>INTEGER :: stat</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Result, the type code of the value with the key
+or 0 if no such key/value</pre><hr></td></tr>
+<tr><td colspan=3>list_hash_keys() RESULT(keylist)</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2><pre>List all the hash keys that are in use.
+mainly for debugging</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>Variables inside</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>CHARACTER(LEN=hash_key_length), DIMENSION(:), POINTER :: keylist</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Result, array of key-values (strings) that are in the hashtable</pre><hr></td></tr>
+</table>
+<h3>Subroutines</h3>
+<table>
+<tr><td colspan=3>init_hash(n)</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2><pre>Initialize the hash table before using it.
+Call with maximum number of different hash keys n.
+Hashtable can store more than n key/value pairs, but
+it is more efficient when n is larger than the final
+number of pairs.
+If hashtable is called without initialization, operation
+will issue error (see module ErrorCapsule).</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>Variables inside</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>INTEGER, INTENT(IN) :: n</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Input, max. number of different hash keys</pre><hr></td></tr>
+</table>
+<a name="AP_quicksort"></a>
+<h2>Module AP_quicksort</h2>
+<p><pre>AP_Quicksort
+Implements recursive in-place quicksort and list partition algorithms,
+as they are presented in Wikipedia (June 2012). Implements them to integer
+and real arrays as well as for integer and real tables.
+This implementation is quite fast, perhaps due to the design
+where generic interface wrappers are called but the computation
+is done inside simpler internal functions.
+-
+Can be used with Type_Kinds module by PaulV, default is without.
+-
+Two public interfaces -- AP_Qsort and AP_partition.
+-
+If you use this code in a publication, please make a reference to:
+A. Penttila", Fortran 95 implementation of the Quicksort algorithm (computer code),
+http://wiki.helsinki.fi/display/~aipentti@helsinki.fi/Collection+of+codes (2012).
+-
+Antti Penttila"
+2012
+Department of Physics, University of Helsinki</pre>
+<h3>Variables</h3>
+<table>
+<tr><td colspan=2>INTEGER, PARAMETER :: internal_double_type = SELECTED_REAL_KIND(15)</td></tr>
+<tr><td><pre>  </pre></td><td><pre>Use if no Type_Kinds module
+define double precision reals</pre><hr></td></tr>
+</table>
+<h3>Interfaces</h3>
+<table>
+<tr><td colspan=2>AP_Qsort</td></tr>
+<tr><td><pre>  </pre></td><td><pre>Public interface AP_Qsort implements the quicksort algorithm to
+integer arrays and tables, and to real array and tables.
+Different versions of the interface are:
+-
+subroutine AP_Qsort(vec, LOW, HIGH), where
+vec is either real or integer array to be sorted.
+Optional arguments LOW and HIGH can be used to give the start index in vec array
+and the end index in vec array. By default, the whole array is sorted.
+-
+OR
+-
+subroutine AP_Qsort(mat, LOW, HIGH, COLUMNS), where
+mat is either real or integer table (i.e. matrix) to be sorted.
+Extra optional argument COLUMNS gives the indices of columns that are used in sorting.
+Default is to sort using all the columns, and in order of first to last column.</pre><hr></td></tr>
+<tr><td colspan=2>AP_partition</td></tr>
+<tr><td><pre>  </pre></td><td><pre>Public interface AP_partition implements partition of array or table
+using a given pivot element. Versions of the interface are:
+-
+function AP_partition(vec, pivot, LOW, HIGH), where
+vec is either real or integer array to be partitioned.
+pivot is the index of the pivot value in vec by which the array will be partitioned.
+Optional arguments LOW and HIGH can be used to give the start index in vec array
+and the end index in vec array. By default, the whole array is partitioned.
+Function will return an index of new pivot value. Array values from indices LOW to pivot will
+be smaller than or equal to value in pivot, and values from indices pivot+1 to HIGH will be larger.
+-
+OR
+-
+function AP_partition(mat, pivot, LOW, HIGH, COLUMNS), where
+mat is either real or integer table (i.e. matrix) to be partitioned.
+Extra optional argument COLUMNS gives the indices of columns that are used in partitioning.
+Default is to partition using all the columns, and in order of first to last column.</pre><hr></td></tr>
+</table>
+<a name="AP_utils"></a>
+<h2>Module AP_utils</h2>
+<p><pre>Module for collected general-use math and related algorithms
+-
+Antti Penttila"
+2012
+Department of Physics, University of Helsinki</pre>
+<h3>Modules needed</h3>
+<table>
+<tr><td colspan=2>USE Type_Kinds</td></tr>
+<tr><td><pre>  </pre></td><td><pre>Needs PaulV Type_Kinds module to define 'FP_KIND' precision type</pre><hr></td></tr>
+<tr><td colspan=2>USE Fundamental_Constants</td></tr>
+<tr><td><pre>  </pre></td><td><pre>Needs PaulV Fundamental_Constants module for various constants</pre><hr></td></tr>
+<tr><td colspan=2>USE AP_quicksort</td></tr>
+<tr><td><pre>  </pre></td><td><pre>Needs AP_quicksort for quicksort implementation</pre><hr></td></tr>
+</table>
+<h3>Variables</h3>
+<table>
+<tr><td colspan=2>REAL(FP_KIND), DIMENSION(:), INTENT(OUT) :: vec</td></tr>
+<tr><td><pre>  </pre></td><td><pre>Output vector for random numbers</pre><hr></td></tr>
+<tr><td colspan=2>REAL(FP_KIND), INTENT(IN), OPTIONAL :: MEAN, STD</td></tr>
+<tr><td><pre>  </pre></td><td><pre>Optional input arguments, defaults are 0.0 and 1.0</pre><hr></td></tr>
+<tr><td colspan=2>REAL(FP_KIND), DIMENSION(:), INTENT(OUT) :: vec</td></tr>
+<tr><td><pre>  </pre></td><td><pre>Output vector of random numbers</pre><hr></td></tr>
+<tr><td colspan=2>REAL(FP_KIND), INTENT(IN), OPTIONAL :: MEAN, STD, REP_MEAN, REP_STD</td></tr>
+<tr><td><pre>  </pre></td><td><pre>Optional inputs. Default is standard parametrization with underlying
+normal distribution having mean 0 and std 1. If REP_MEAN is given
+the reparametrized version will be used, where default REP_STD = 1</pre><hr></td></tr>
+</table>
+<h3>Global types</h3>
+<table>
+<tr><td colspan=3>corput_series</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2><pre>Combined data type for van der Corput series</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>Variables inside</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>INTEGER :: base</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>base of the series</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>INTEGER, DIMENSION(:), ALLOCATABLE :: sigma</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>sigma-parameters</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>REAL(FP_KIND), DIMENSION(:), ALLOCATABLE :: vdc</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>values of the series</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>INTEGER :: cur_k</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>current length of the series</pre><hr></td></tr>
+</table>
+<h3>Interfaces</h3>
+<table>
+<tr><td colspan=2>write_to</td></tr>
+<tr><td><pre>  </pre></td><td><pre>Public interface for a subroutine, writes string to given unit or
+to a list of units. Make sure that units are open for writing.
+Call write_to(ch,str), where
+str is the string that needs to be written, and
+ch is either one unit number (integer), or a list of
+unit numbers. Use number 0 to write to std_out.</pre><hr></td></tr>
+<tr><td colspan=2>random_sort</td></tr>
+<tr><td><pre>  </pre></td><td><pre>Public interface for a subroutine that randomly sorts
+the elements in a real or integer array. Call with
+random_sort(array), the array is returned randomly mixed.</pre><hr></td></tr>
+<tr><td colspan=2>is_sorted</td></tr>
+<tr><td><pre>  </pre></td><td><pre>Public interface for a function that will test if
+given integer/real array is sorted in ascending order.
+Call as 'sorted = is_sorted(array)', the resultint logical value
+'sorted' will have a value .TRUE. is the array is sorted.</pre><hr></td></tr>
+</table>
+<h3>Functions</h3>
+<table>
+<tr><td colspan=3>toc(LAP) RESULT(time)</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2><pre>Get the time that has elapsed from calling tic()
+in seconds. Be sure to call tic() at least once before
+toc() is used. If optional argument LAP is .TRUE., will
+not reset the timer. By default will reset the timer.</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>Variables inside</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>LOGICAL, OPTIONAL :: LAP</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Optional input</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>REAL(FP_KIND) :: time</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Output, elapsed time in seconds</pre><hr></td></tr>
+<tr><td colspan=3>vec3_norm_of_diff(vec_a, vec_b) RESULT(d)</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2><pre>Norm of (vec_a - vec_b), where both are 3-dimensional
+real vectors</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>Variables inside</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>REAL(FP_KIND), DIMENSION(3), INTENT(IN) :: vec_a, vec_b</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Input vectors</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>REAL(FP_KIND) :: d</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Output real</pre><hr></td></tr>
+<tr><td colspan=3>vec3_norm(vec) RESULT(x)</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2><pre>3-dimensional vector norm</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>Variables inside</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>REAL(FP_KIND), DIMENSION(3), INTENT(IN) :: vec</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Input</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>REAL(FP_KIND) :: x</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Result</pre><hr></td></tr>
+<tr><td colspan=3>vec3_angle_between(vec1, vec2) RESULT(ang)</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2><pre>Calculates the angle between 3-dimensional vec1 and vec2 in radians</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>Variables inside</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>REAL(FP_KIND), DIMENSION(3), INTENT(IN) :: vec1, vec2</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Inputs</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>REAL(FP_KIND) :: ang</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Result</pre><hr></td></tr>
+<tr><td colspan=3>normal_rnd(MEAN, STD) RESULT(x)</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2><pre>On random number from normal distribution.
+Initialize random number generator yourself or
+call init_rng() once before calling any random number function.</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>Variables inside</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>REAL(FP_KIND), INTENT(IN), OPTIONAL :: MEAN, STD</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Optional input arguments, defaults are 0.0 and 1.0</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>REAL(FP_KIND) :: x</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Result</pre><hr></td></tr>
+<tr><td colspan=3>log_normal_rnd(MEAN, STD, REP_MEAN, REP_STD) RESULT(x)</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2><pre>One random number from log-normal distribution.
+Two optional parametrizations; with MEAN and STD (standard version) or
+with REP_MEAN and REP_STD where these will be the mean and std
+of the resulting log-normal distribution.
+Initialize random number generator yourself or
+call init_rng() once before calling any random number function.</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>Variables inside</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>REAL(FP_KIND), INTENT(IN), OPTIONAL :: MEAN, STD, REP_MEAN, REP_STD</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Optional inputs. Default is standard parametrization with underlying
+normal distribution having mean 0 and std 1. If REP_MEAN is given
+the reparametrized version will be used, where default REP_STD = 1</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>REAL(FP_KIND) :: x</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Result</pre><hr></td></tr>
+<tr><td colspan=3>linear_interpolation(x, tab, ind, STAT, PREV_I) RESULT(y)</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2><pre>Linear interpolation. Interpolate value y at x, based on the
+linear interpolation between nearest points in table tab</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>Variables inside</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>REAL(FP_KIND), INTENT(IN) :: x</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Input, where to interpolate</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>REAL(FP_KIND), DIMENSION(:,:), INTENT(IN) :: tab</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Input data matrix. Must have (at least) two columns where the
+x and y -values of the function are stored, and rows must be
+sorted in ascending order in x.</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>INTEGER, DIMENSION(2), INTENT(IN) :: ind</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Input, column numbers of x and y -values in data matrix.</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>INTEGER, OPTIONAL, INTENT(OUT) :: STAT</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Optional status code, output. If the x is below the value range
+in data, -1 will be returned, and -2 if x is above the range.
+In normal operation 0 will be returned.</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>INTEGER, OPTIONAL, INTENT(INOUT) :: PREV_I</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Optional input. If you know beforehand the row numbers
+that enclose the given x value, you can give the lower limit row number
+to fasten the computation.</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>REAL(FP_KIND) :: y</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Result</pre><hr></td></tr>
+<tr><td colspan=3>give_rnr(LOW, UP) RESULT(rn)</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2><pre>Real-valued random number in a given interval.</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>Variables inside</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>REAL(FP_KIND), INTENT(IN), OPTIONAL :: LOW, UP</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Optional inputs, lower and upper limits for the
+random number. Default is [0,1[. Result is always
+smaller than the upper limit.</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>REAL(FP_KIND) :: rn</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Result</pre><hr></td></tr>
+<tr><td colspan=3>give_rnr_int(LOW, UP) RESULT(rn)</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2><pre>Integer-valued random number in a given interval.</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>Variables inside</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>INTEGER, INTENT(IN), OPTIONAL :: LOW, UP</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Optional inputs, lower and upper limits for the
+random number. Default is [0,1]. Both lower and upper
+limits are possible to attain.</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>INTEGER :: rn</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Result</pre><hr></td></tr>
+<tr><td colspan=3>is_odd(n) RESULT(odd)</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2><pre>is integer odd?</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>Variables inside</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>INTEGER, INTENT(IN) :: n</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Input</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>LOGICAL :: odd</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Result, .TRUE. if n is odd</pre><hr></td></tr>
+<tr><td colspan=3>init_corput(base, RANDOMINIT, SER_LEN) RESULT(vdcs)</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2><pre>Copyright (C) 1997 Makoto Matsumoto and Takuji Nishimura.
+Fortran translation by Hiroshi Takano.  Jan. 13, 1999.
+Fortran version rewritten as an F90 module and mt state saving and getting
+subroutines added by Richard Woloshyn. June 30, 1999
+-
+Inits van der Corput chain</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>Variables inside</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>INTEGER, INTENT(IN) :: base</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Input, base</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>LOGICAL, INTENT(IN), OPTIONAL :: RANDOMINIT</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Optional input, set .TRUE. if you need to init
+the random number generator</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>INTEGER, INTENT(IN), OPTIONAL :: SER_LEN</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Optional length of series, default is 50</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>TYPE(corput_series) :: vdcs</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Result, van der Corput series</pre><hr></td></tr>
+</table>
+<h3>Subroutines</h3>
+<table>
+<tr><td colspan=3>tic()</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2><pre>Start to record time or reset the timer</pre><hr></td></tr>
+<tr><td colspan=3>union_integer(ivec, n, REMOVE)</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2><pre>Union of list of integers. Call with
+union_integer(ivec, n, REMOVE), where
+ivec is the list of integers, that will, on return, contain a
+sorted union of input array.
+When calling, argument n is the number of elements in the input array
+from which the union will be formed. Use 0 if all teh elements are used.
+On return, n will be the number of elements in the union, and the union elements
+will be in places ivec(1:n).
+If optional integer 'REMOVE' is given, that value is not included in the union</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>Variables inside</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>INTEGER, DIMENSION(:), INTENT(INOUT) :: ivec</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Input - integer array / output - sorted union of elements</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>INTEGER, INTENT(INOUT) :: n</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Input - length of array to be handled or 0 for all values.
+Output - number of distinct elements in ivec</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>INTEGER, OPTIONAL :: REMOVE</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Optional integer value to be removed from the results</pre><hr></td></tr>
+<tr><td colspan=3>vec3_add_and_scale(vec1, vec2, sca)</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2><pre>Adds 3-dimensional vec2 to vec1, and optionally scales to length sca</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>Variables inside</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>REAL(FP_KIND), DIMENSION(3), INTENT(INOUT) :: vec1</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Input - vec1, output - added and scaled vector</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>REAL(FP_KIND), DIMENSION(3), INTENT(IN) :: vec2</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Second input vector</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>REAL(FP_KIND), OPTIONAL :: sca</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Optional input, resulting length of the vector.
+If not given, scaled to 1.</pre><hr></td></tr>
+<tr><td colspan=3>vec3_scale(vec, sca)</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2><pre>Scales 3-dimensional vec to length sca</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>Variables inside</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>REAL(FP_KIND), DIMENSION(3), INTENT(INOUT) :: vec</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Input and output</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>REAL(FP_KIND) :: sca</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Input, length of vec on return</pre><hr></td></tr>
+<tr><td colspan=3>vec3_add(vec1, vec2)</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2><pre>Adds two 3-dimensional vectors</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>Variables inside</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>REAL(FP_KIND), DIMENSION(3), INTENT(INOUT) :: vec1</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Added vector will be in vec1 on return</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>REAL(FP_KIND), DIMENSION(3), INTENT(IN) :: vec2</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Input</pre><hr></td></tr>
+<tr><td colspan=3>init_rng()</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2><pre>Inits the random number generator from system clock.
+Call once before using the random number generator.
+Works at least with gfortran</pre><hr></td></tr>
+<tr><td colspan=3>give_rotation_matrix(rvec, rmat)</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2><pre>Give rotation matrix R, which rotates
+vector (0,0,1) to (a,b,c) when applied
+as (R . v). The (a,b,c) and v should have unit-lenght</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>Variables inside</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>REAL(FP_KIND), DIMENSION(3), INTENT(IN) :: rvec</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Input, where to rotate</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>REAL(FP_KIND), DIMENSION(3,3), INTENT(INOUT) :: rmat</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Output, rotation matrix</pre><hr></td></tr>
+<tr><td colspan=3>vec3_rnd_dir(dir_v)</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2><pre>Random direction / vector on unit sphere</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>Variables inside</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>REAL(FP_KIND), DIMENSION(3), INTENT(OUT) :: dir_v</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Output, random vector on unit sphere</pre><hr></td></tr>
+<tr><td colspan=3>rnd_HGR(res_v, g, round, D, sca)</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2><pre>Random direction and length from Henyey-Greenstsein
+direction distribution and reparametrized log-normal
+radius direction. The radius distribution is a reparametrized log-normal
+where tau is both the mean and the standard deviation of the distribution.
+The tau is computed as sca*exp(1-round^(1/D)). Parameters round and D
+are related to the simulated annealing temperature factor.</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>Variables inside</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>REAL(FP_KIND), DIMENSION(3), INTENT(OUT) :: res_v</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Output, vector with direction from Henyey-Greenstsein and
+length from lognormal distributions</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>REAL(FP_KIND), INTENT(IN) :: g</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Input, asymmetry factor, parameter for H-G</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>INTEGER, INTENT(IN) :: round</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Input, round parameter for simulated annealing scaling. Use 1 for no scaling.</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>INTEGER, INTENT(IN) :: D</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Input, D parameter for simulated annealing scaling.</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>REAL(FP_KIND), INTENT(IN), OPTIONAL :: sca</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Optional extra scaling factor for radius.</pre><hr></td></tr>
+<tr><td colspan=3>vec3_rnd_rotation(dir_v, p)</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2><pre>Random rotation for 3-dimensional vector
+Rotation angle is from exponential distribution in range 0-180 deg</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>Variables inside</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>REAL(FP_KIND), DIMENSION(3), INTENT(INOUT) :: dir_v</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Input - vector to be rotated, output - rotated vector</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>REAL(FP_KIND), INTENT(IN) :: p</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Input, parameter for exponential distribution</pre><hr></td></tr>
+<tr><td colspan=3>print_matrix(m, CHANNEL)</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2><pre>Print matrix row-vise to a given chanel.
+Use channel 0 for std_out, and make sure
+that the channel is open for writing.</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>Variables inside</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>REAL(FP_KIND), DIMENSION(:,:), INTENT(IN) :: m</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Input, real matrix to be printed</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>INTEGER, OPTIONAL, INTENT(IN) :: CHANNEL</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Optional, channel where to print. 0 (default) for std_out</pre><hr></td></tr>
+<tr><td colspan=3>corput(vdcs, k)</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2><pre>Computes van der Corput series up to order k.
+series (vdcs) must be inited first.</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>Variables inside</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>TYPE(corput_series), INTENT(INOUT) :: vdcs</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Input - exisiting series object
+Output - same series but with k elemenents computed.</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>INTEGER, INTENT(IN) :: k</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Input, order up to which compute elements</pre><hr></td></tr>
+</table>
+<a name="InputParser"></a>
+<h2>Module InputParser</h2>
+<p><pre>Provides input parser in Fortran 90/95
+Inputs from command line are 'key=value'-pairs, and inputs from file are read in Simantics format.
+Can be used to set default values for input parameters, automatically process command line or input file
+parameters, and get the values of the parameters.
+-
+If you use this code in a publication, please make a reference to:
+A. Penttila", Fortran 95 Input Parser implementation (computer code),
+http://wiki.helsinki.fi/display/~aipentti@helsinki.fi/Collection+of+codes (2012).
+-
+Antti Penttila"
+2012
+Department of Physics, University of Helsinki</pre>
+<h3>Modules needed</h3>
+<table>
+<tr><td colspan=2>USE Type_Kinds</td></tr>
+<tr><td><pre>  </pre></td><td><pre>Double type FP_KIND from PaulV module</pre><hr></td></tr>
+<tr><td colspan=2>USE Hashtable</td></tr>
+<tr><td><pre>  </pre></td><td><pre>Hashtable for storing key/value pairs of input</pre><hr></td></tr>
+<tr><td colspan=2>USE String_Utility</td></tr>
+<tr><td><pre>  </pre></td><td><pre>PaulV string operations</pre><hr></td></tr>
+<tr><td colspan=2>USE File_Utility</td></tr>
+<tr><td><pre>  </pre></td><td><pre>PaulV file operations</pre><hr></td></tr>
+<tr><td colspan=2>USE ErrorCapsule</td></tr>
+<tr><td><pre>  </pre></td><td><pre>My own wrapper for handling errors</pre><hr></td></tr>
+<tr><td colspan=2>USE AP_utils</td></tr>
+<tr><td><pre>  </pre></td><td><pre>Some math- and printing routines</pre><hr></td></tr>
+</table>
+<h3>Variables</h3>
+<table>
+<tr><td colspan=2>INTEGER, PARAMETER :: inp_key_length = hash_key_length</td></tr>
+<tr><td><pre>  </pre></td><td><pre>Maximum string lenght for input keyword, inherited from Hastable</pre><hr></td></tr>
+<tr><td colspan=2>INTEGER, PARAMETER :: inp_type_int = type_int, inp_type_real = type_real, inp_type_char = type_char,inp_type_logical = type_logical, inp_type_string = type_string, inp_type_file_et_line = type_file_et_line</td></tr>
+<tr><td><pre>  </pre></td><td><pre>Inherited variable type codes, inherited from Hastable</pre><hr></td></tr>
+<tr><td colspan=2>INTEGER, PARAMETER :: inp_max_string_length = max_string_length</td></tr>
+<tr><td><pre>  </pre></td><td><pre>Maximum string length for string value, inherited from Hastable</pre><hr></td></tr>
+<tr><td colspan=2>INTEGER, PARAMETER :: inp_error_defined = -131, inp_error_wrong_type = error_wrong_type, inp_error_file_open = -132,inp_command_line = -133</td></tr>
+<tr><td><pre>  </pre></td><td><pre>Error codes</pre><hr></td></tr>
+</table>
+<h3>Interfaces</h3>
+<table>
+<tr><td colspan=2>setup_value</td></tr>
+<tr><td><pre>  </pre></td><td><pre>Public interface, setup input key and give default value. This must be done for every possible input key
+before the input file is read.
+Call setup_input(key, default_value) where
+key is input keyword (string), and default value is integer, real, logical or character
+or
+setup_input(key, default_string, str_len)
+with string value and string length
+or
+setup_input(key, default_integer, default_string, str_len)
+with both string value and integer value (typically for file name and line number).</pre><hr></td></tr>
+<tr><td colspan=2>setup_cmd_arg</td></tr>
+<tr><td><pre>  </pre></td><td><pre>Public interface, setup command line input key and give default value. This must be done for
+every possible input key before the command line is processed.
+Call setup_cmd_arg(key, default_value) where
+key is command line keyword (string), and default value is integer, real, logical or character
+or
+setup_cmd_arg(key, default_string, str_len)
+with string value and string length.
+Command line arguments must be given in 'key=value'-format.</pre><hr></td></tr>
+<tr><td colspan=2>get_value</td></tr>
+<tr><td><pre>  </pre></td><td><pre>Public interface, get the current value of the input key.
+Call get_value(key, value_data) where
+key is input keyword (string), and value_data is integer, real, logical or character
+or
+get_value(key, value_string, str_len)
+with string value and string length
+or
+get_value(key, value_integer, value_string, str_len)
+with both string value and integer value (typically for file name and line number).</pre><hr></td></tr>
+<tr><td colspan=2>get_cmd_arg</td></tr>
+<tr><td><pre>  </pre></td><td><pre>Public interface, get the current value of the command line key.
+Call get_cmd_arg(key, value_data) where
+key is input keyword (string), and value_data is integer, real, logical or character
+or
+get_cmd_arg(key, value_string, str_len)
+with string value and string length.</pre><hr></td></tr>
+<tr><td colspan=2>read_input</td></tr>
+<tr><td><pre>  </pre></td><td><pre>Public interface, read and process input file. All the possible
+input keys in the file must been set a default value beforehand.
+Call read_input(fn, DEBUG) where
+fn is the filename of the input file, and if optional logical
+DEGUG is set .TRUE. (default is .FALSE.), debug information is printed to std_out
+while processing the input file
+or
+read_input(ch, DEBUG, FN) where
+ch is read-cabable open unit. FN is optional string value that is given to
+file_et_line-type integer input as the file name if read from input.</pre><hr></td></tr>
+</table>
+<h3>Subroutines</h3>
+<table>
+<tr><td colspan=3>init_input(n)</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2><pre>Initialize input parser by calling this before
+anything else from this module is called.</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>Variables inside</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>INTEGER, INTENT(IN) :: n</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Input, hashtable that is used to store input/value-pairs is
+inited with this number. Optimal case would be that n is somewhat larger,
+e.g. twice as large, as the number of inputs. Will work also if n is smaller,
+but not so efficiently.</pre><hr></td></tr>
+<tr><td colspan=3>read_cmd_arg(DEBUG)</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2><pre>Process command line arguments. All the possible command line keys
+must have been set default values. Command line keys adn values must
+be given as 'key=value'. If optional argument DEBUG is .TRUE. (default is .FALSE.),
+debugging information is printed in std_out.</pre></td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>Variables inside</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2>LOGICAL, INTENT(IN), OPTIONAL :: DEBUG</td></tr>
+<tr><td colspan=2><pre>    </pre></td><td><pre>Optional, set .TRUE. for debugging.</pre><hr></td></tr>
+<tr><td colspan=3>print_input_values()</td></tr>
+<tr><td><pre>  </pre></td><td colspan=2><pre>Print all input keys and their current values,
+use for debugging.</pre><hr></td></tr>
+</table>
+<p></p>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<pro>
+MeshConvert
+<com>
+Mesh converter
+-
+Command line tool for converting different polygon mesh and voxel file formats.
+Currently, possible input formats are:
+.OBJ, open format polygonal mesh file
+.MRT, Macke Ray Tracing file format
+and possible output formats are
+.POV, POV-Ray raytracing format
+.ADD, Adda format for rectangular grid volume-based voxel format
+.OBJ, open format polygonal mesh file
+.NFO, general information about the structure defined in the input file
+-
+Usage: MeshConvert infile informat outfile outformat [reduce_vertices].
+Note that input and output file formats are concluded from the command line argument
+informat (obj/mrt) and outformat (pov/add/obj/nfo), and not from the file suffix of the input
+or output file name. Optionally, keyword 'reduce_vertices' can be given. In that case the code
+tries to look for dublicate vertex points and reduce the size of the polygonal mesh. This can be slow.
+-
+If you use this code in a publication, please make a reference to:
+A. Penttila", Mesh converting software (computer code),
+http://wiki.helsinki.fi/display/~aipentti@helsinki.fi/Collection+of+codes (2012).
+-
+Antti Penttila"
+2012
+Department of Physics, University of Helsinki
+<endcom>
+<use>
+USE Type_Kinds
+<com>
+Double precision FP_KIND type parameter from PaulV
+<endcom>
+<enduse>
+<use>
+USE File_Utility
+<com>
+File handling routines from PaulV
+<endcom>
+<enduse>
+<use>
+USE String_Utility
+<com>
+String routines from PaulV
+<endcom>
+<enduse>
+<use>
+USE AP_utils
+<com>
+My own math- and printing-related routines
+<endcom>
+<enduse>
+<endpro>
